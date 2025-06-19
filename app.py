@@ -11,30 +11,21 @@ client = OpenAI(
     base_url="https://openrouter.ai/api/v1"
 )
 
-# Configure Streamlit UI
 st.set_page_config(page_title="📘 AI Textbook Assistant", layout="wide")
 st.title("📘 AI Textbook Question Answering App")
 st.markdown("Upload a textbook (PDF), ask any question, and get a smart AI answer!")
 
-# -------------------------------
-# Upload PDF
-# -------------------------------
 uploaded_file = st.file_uploader("📄 Upload your textbook (PDF)", type="pdf")
 
 if uploaded_file:
-    # Read and extract text
     text = ""
     doc = fitz.open(stream=uploaded_file.read(), filetype="pdf")
     for page in doc:
         text += page.get_text()
     st.success("✅ PDF loaded successfully!")
 
-    # Split into paragraphs
     paragraphs = [p.strip() for p in text.split("\n") if len(p.strip()) > 30]
 
-    # -------------------------------
-    # Generate embeddings using OpenAI
-    # -------------------------------
     def get_embedding(text):
         response = client.embeddings.create(
             model="openai/text-embedding-ada-002",
@@ -46,9 +37,6 @@ if uploaded_file:
         para_embeddings = [get_embedding(p) for p in paragraphs]
         st.success(f"✅ {len(para_embeddings)} paragraphs indexed.")
 
-    # -------------------------------
-    # Question Answering
-    # -------------------------------
     question = st.text_input("❓ Ask a question from the textbook")
 
     def ask_gpt(context, question):
@@ -81,9 +69,6 @@ if uploaded_file:
         st.success("✅ Answer:")
         st.write(answer)
 
-    # -------------------------------
-    # Summarization
-    # -------------------------------
     if st.button("📌 Summarize Entire Book"):
         st.info("⏳ Summarizing book...")
         all_chunks = [text[i:i+3000] for i in range(0, len(text), 3000)]
