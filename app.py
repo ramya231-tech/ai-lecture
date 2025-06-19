@@ -4,6 +4,7 @@ from sentence_transformers import SentenceTransformer, util
 from openai import OpenAI
 import os
 from tqdm import tqdm
+import torch
 
 # Initialize OpenAI client (via OpenRouter)
 client = OpenAI(
@@ -11,8 +12,8 @@ client = OpenAI(
     base_url="https://openrouter.ai/api/v1"
 )
 
-# Load sentence transformer model
-model = SentenceTransformer('all-MiniLM-L6-v2')
+# ✅ FIX: Force the model to run on CPU to avoid NotImplementedError
+model = SentenceTransformer('all-MiniLM-L6-v2', device='cpu')
 
 st.set_page_config(page_title="📘 AI Textbook Assistant", layout="wide")
 st.title("📘 AI Textbook Question Answering App")
